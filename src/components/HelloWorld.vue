@@ -121,7 +121,7 @@
                     format: [900, 1400]
                   });
                   doc.addImage(img, "JPEG", 20, 20);
-                  doc.save('doc.pdf');
+                  doc.save('attestation.pdf');
                 })
                 .catch(function(error) {
                   console.error("oops, something went wrong!", error);
