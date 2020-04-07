@@ -30,7 +30,15 @@
             <h2 class="headline font-weight-bold mb-3">
               Choissisez un motif de sortie
             </h2>
-            <v-text-field outlined label="Date de sortie" type="date" class="subheading mx-3" v-model="leaveDate" />
+            <v-checkbox value="1" v-model="travail" label="Déplacements entre le domicile et le lieu d’exercice de l’activité professionnelle, lorsqu'ils sont indispensables à l'exercice d’activités ne pouvant être organisées sous forme de télétravail ou déplacements professionnels ne pouvant être différés."></v-checkbox>
+            <v-checkbox value="1" v-model="courses" label="Déplacements pour effectuer des achats de fournitures nécessaires à l’activité professionnelle et des achats de première nécessité dans des établissements dont les activités demeurent autorisées"></v-checkbox>
+            <v-checkbox value="1" v-model="sante" label="Consultations et soins ne pouvant être assurés à distance et ne pouvant être différés ; consultations et soins des patients atteints d'une affection de longue durée."></v-checkbox>
+            <v-checkbox value="1" v-model="famille" label="Déplacements pour motif familial impérieux, pour l’assistance aux personnes vulnérables ou la garde d’enfants."></v-checkbox>
+            <v-checkbox value="1" v-model="sport" label="Déplacements brefs, dans la limite d'une heure quotidienne et dans un rayon maximal d'un kilomètre autour du domicile, liés soit à l'activité physique individuelle des personnes, à l'exclusion de toute pratique sportive collective et de toute proximité avec d'autres personnes, soit à la promenade avec les seules personnes regroupées dans un même domicile, soit aux besoins des animaux de compagnie."></v-checkbox>
+            <v-checkbox value="1" v-model="judiciaire" label="Convocation judiciaire ou administrative."></v-checkbox>
+            <v-checkbox value="1" v-model="missions" label="Participation à des missions d’intérêt général sur demande de l’autorité administrative."></v-checkbox>
+
+            <v-text-field outlined label="Date de sortie" type="date" class="subheading mx-3 mt-5" v-model="leaveDate" />
             <v-text-field outlined label="Heure de sortie" type="time" class="subheading mx-3" v-model="leaveHour" />
           </div>
         </v-row>
@@ -73,8 +81,6 @@
     },
     methods: {
       generateAttest: function () {
-          // this.infos.name = this.name;
-          // alert(this.infos.name)
           localStorage.setItem(STORAGE_KEY_NAME, JSON.stringify(this.name))
           localStorage.setItem(STORAGE_KEY_SURNAME, JSON.stringify(this.surname))
           localStorage.setItem(STORAGE_KEY_BIRTHDATE, JSON.stringify(this.birthday))
@@ -96,7 +102,58 @@
         let min = this.leaveHour.substring(3, 5);
         this.leaveHourFinal = hour + 'h' + min;
 
-        this.value = 'Cree le: ' + new Date().toLocaleString('fr-FR').substring(0, 10) + ' a ' + new Date().toLocaleString('fr-FR').substring(13, 15) + 'h' + new Date().toLocaleString('fr-FR').substring(16, 18) + '; Nom: ' + this.name + '; Prenom: ' + this.surname + '; Naissance: ' + this.birthFinal + ' a ' + this.zoneBirth + '; Adresse: ' + this.address + ' ' + this.postalCode + ' ' + this.city + '; Sortie: ' + this.leaveDateFinal + ' a ' + this.leaveHourFinal + '; Motifs: sport'
+        if (this.travail == 1) {
+          if (this.motif == null) {
+            this.motif = 'travail';
+          } else {
+            this.motif += '-travail';
+          }
+        }
+        if (this.courses == 1) {
+          if (this.motif == null) {
+            this.motif = 'courses';
+          } else {
+            this.motif += '-courses';
+          }
+        }
+        if (this.sport == 1) {
+          if (this.motif == null) {
+            this.motif = 'sport';
+          } else {
+            this.motif += '-sport';
+          }
+        }
+        if (this.sante == 1) {
+          if (this.motif == null) {
+            this.motif = 'sante';
+          } else {
+            this.motif += '-sante';
+          }
+        }
+        if (this.famille == 1) {
+          if (this.motif == null) {
+            this.motif = 'famille';
+          } else {
+            this.motif += '-famille';
+          }
+        }
+        if (this.judiciaire == 1) {
+          if (this.motif == null) {
+            this.motif = 'judiciaire';
+          } else {
+            this.motif += '-judiciaire';
+          }
+        }
+        if (this.missions == 1) {
+          if (this.motif == null) {
+            this.motif = 'missions';
+          } else {
+            this.motif += '-missions';
+          }
+        }
+
+
+        this.value = 'Cree le: ' + new Date().toLocaleString('fr-FR').substring(0, 10) + ' a ' + new Date().toLocaleString('fr-FR').substring(13, 15) + 'h' + new Date().toLocaleString('fr-FR').substring(16, 18) + '; Nom: ' + this.name + '; Prenom: ' + this.surname + '; Naissance: ' + this.birthFinal + ' a ' + this.zoneBirth + '; Adresse: ' + this.address + ' ' + this.postalCode + ' ' + this.city + '; Sortie: ' + this.leaveDateFinal + ' a ' + this.leaveHourFinal + '; Motifs: ' + this.motif;
         this.createPDF();
       },
       createPDF() {
@@ -145,6 +202,17 @@
       leaveDateFinal: null,
       leaveHour: null,
       leaveHourFinal: null,
+
+      travail: null,
+      sport: null,
+      courses: null,
+      sante: null,
+      famille: null,
+      judiciaire: null,
+      missions: null,
+
+      motif: null,
+      motifs: ['sport', 'travail', 'courses', 'sante', 'famille', 'judiciaire', 'missions']
     }),
     created() {
       let today = new Date().toLocaleString();
@@ -158,10 +226,6 @@
       this.address = JSON.parse(localStorage.getItem(STORAGE_KEY_ADDRESS || null));
       this.city = JSON.parse(localStorage.getItem(STORAGE_KEY_CITY || null));
       this.postalCode = JSON.parse(localStorage.getItem(STORAGE_KEY_POSTALCODE || null));
-
-      // if (this.infos.name != null) {
-      //   this.name = this.infos.name
-      // }
     }
   }
 </script>
